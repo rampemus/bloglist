@@ -1,0 +1,20 @@
+{
+    "name": "bloglist",
+    "version": "1.0.0",
+    "description": "fullstack course exercise 4.1-4.2",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \\\"Error: no test specified\\\" && exit 1",
+        "watch": "nodemon index.js",
+        "lint": "eslint .",
+        "fix": "eslint . --fix"
+    },
+    "author": "Pasi Toivanen",
+    "license": "MIT",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "mongoose": "^5.6.7"
+    }
+}

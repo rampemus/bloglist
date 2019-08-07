@@ -3,12 +3,15 @@
     "version": "1.0.0",
     "description": "fullstack course exercise 4.1-4.2",
     "main": "index.js",
+    "jest": {
+        "testEnvironment": "node"
+    },
     "scripts": {
         "start": "node index.js",
-        "test": "echo \\\"Error: no test specified\\\" && exit 1",
         "watch": "nodemon index.js",
         "lint": "eslint .",
-        "fix": "eslint . --fix"
+        "fix": "eslint . --fix",
+        "test": "jest"
     },
     "author": "Pasi Toivanen",
     "license": "MIT",
@@ -16,10 +19,12 @@
         "cors": "^2.8.5",
         "dotenv": "^8.0.0",
         "express": "^4.17.1",
+        "lodash": "^4.17.15",
         "mongoose": "^5.6.7"
     },
     "devDependencies": {
         "eslint": "^6.1.0",
+        "jest": "^24.8.0",
         "nodemon": "^1.19.1"
     }
 }

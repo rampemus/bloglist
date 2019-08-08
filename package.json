@@ -11,7 +11,7 @@
         "watch": "nodemon index.js",
         "lint": "eslint .",
         "fix": "eslint . --fix",
-        "test": "jest"
+        "test": "jest --verbose"
     },
     "author": "Pasi Toivanen",
     "license": "MIT",

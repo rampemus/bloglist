@@ -16,14 +16,16 @@ describe('blog data retrieved correctly', () => {
         expect(response.body.length).toBe(realAmountOfBlogs)
     })
 
-    test('blogs have correctly named id-field', async () => {
+    test('blogs have correctly named id-fields', async () => {
         const response = await api.get('/api/blogs')
-        expect(response.body[0].id).toBeDefined()
+        for ( let i = 0; i < response.body.length; i++) {
+            expect(response.body[i].id).toBeDefined()
+        }
     })
 
 })
 
-describe('blog data added correctly', () => {
+describe('data of blog can be added and removed', () => {
     let testBlog = {
         title: 'First class tests',
         author: 'Robert C. Martin',
@@ -31,24 +33,37 @@ describe('blog data added correctly', () => {
         likes: 10
     }
 
+    let responseToPost = null
+
     test('Blog can be added', async() => {
-        // const response =
-        const response = await api
+
+        responseToPost = await api
             .post('/api/blogs')
             .send(testBlog)
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
 
-        const bodyLengthResponse = await api
+    })
+
+    test('Added blog exists', async() => {
+
+        const response = await api
             .get('/api/blogs')
             .expect(200)
             .expect('Content-Type', /application\/json/)
 
-        expect(bodyLengthResponse.body.length).toBe(realAmountOfBlogs+1)
+        expect(response.body.length).toBe(realAmountOfBlogs+1)
 
+        expect({ ...testBlog, __v:0, id:responseToPost.body.id }.toString()).toContain(response.body.find((blog) => {
+            if ( blog.id === responseToPost.body.id) return blog
+        }).toString())
+
+    })
+
+    test('Blog can be deleted', async() => {
         await api
-            .delete('/api/blogs/'+response.body.id)
+            .delete('/api/blogs/'+responseToPost.body.id)
             .expect(204)
     })
 })

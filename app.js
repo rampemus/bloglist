@@ -4,7 +4,7 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 
-console.log('connectiong to', config.MONGO_URI)
+// console.log('connecting to', config.MONGO_URI)
 
 const mongoUrl = config.MONGODB_URI
 mongoose.connect(mongoUrl, { useNewUrlParser: true })

@@ -26,7 +26,7 @@ blogsRouter.post('/api/blogs', (request, response) => {
 
 blogsRouter.delete('/api/blogs/:id', (request, response) => {
     Blog
-        .findByIdAndRemove(request.params.id)
+        .deleteOne({ _id:request.params.id })
         .then( () => {
             response.status(204).end()
         })

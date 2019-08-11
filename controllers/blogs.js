@@ -14,6 +14,9 @@ blogsRouter.get('/api/blogs', async (request, response) => {
 blogsRouter.post('/api/blogs', async (request, response) => {
     const blog = await new Blog(request.body)
     const result = await blog.save()
+        .catch( error => {
+            response.status(400).json({ error: error.message }).end()
+        })
     response.status(201).json(result)
 })
 

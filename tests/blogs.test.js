@@ -6,23 +6,26 @@ const api = supertest(app)
 
 const realAmountOfBlogs = 2
 
-//before running the tests make sure that data in the test db is
-// {
-//     _id:5d4c156bbd1fa4efeb6594b0
-//     title:"React patterns"
-//     author:"Michael Chan"
-//     url:"https://reactpatterns.com/"
-//     likes:7
-//     __v:0
-// }
-// {
-//     _id:5d4d76eb0369c62ce3b2e4b9
-//     title:"Go To Statement Considered Harmful"
-//     author:"Edsger W. Dijkstra"
-//     url:"http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html"
-//     likes:5
-//     __v:0
-// }
+/***
+    before running the tests make sure that data in the test db is
+    {
+        _id:5d4c156bbd1fa4efeb6594b0
+        title:"React patterns"
+        author:"Michael Chan"
+        url:"https://reactpatterns.com/"
+        likes:7
+        __v:0
+    }
+    {
+        _id:5d4d76eb0369c62ce3b2e4b9
+        title:"Go To Statement Considered Harmful"
+        author:"Edsger W. Dijkstra"
+        url:"http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html"
+        likes:5
+        __v:0
+    }
+***/
+
 
 describe('blog data retrieved correctly', () => {
 
@@ -86,11 +89,11 @@ describe('data of blog can be added and removed', () => {
     })
 })
 
-describe('blogs are validated', async () => {
+describe('blogs are validated', () => {
 
     let responseToPost = null
 
-    test('likes will be 0 when sent as empty', async () => {
+    test('likes will return 0 when sent as empty', async () => {
         const blogWithoutLikes = {
             title: 'First class tests',
             author: 'Robert C. Martin',
@@ -141,8 +144,10 @@ afterAll( async () => {
         .get('/api/blogs')
 
     for ( let i = 0; i < response.body.length; i++ ) {
-        if ( response.body[i].id.toString() !== '5d4c156bbd1fa4efeb6594b0'
-            && response.body[i].id.toString() !== '5d4d76eb0369c62ce3b2e4b9' ) {
+        if (
+            response.body[i].id.toString() !== '5d4c156bbd1fa4efeb6594b0'
+            && response.body[i].id.toString() !== '5d4d76eb0369c62ce3b2e4b9'
+        ) {
             await api
                 .delete('/api/blogs/'+response.body[i].id)
         }

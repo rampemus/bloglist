@@ -90,9 +90,12 @@ describe('data of blog can be added and removed', () => {
 
         const responseToGet = await api
             .get('/api/blogs')
-        expect(responseToGet.body.find((blog) => {
-            if ( blog.id === response.body.id) return blog
-        }).likes).toBe(11)
+
+        const resultedLikes = responseToGet.body.find( blog => {
+            if ( blog.id === response.body.id ) return blog
+        }).likes
+
+        expect(resultedLikes).toBe(11)
     })
 
     test('Blog can be deleted', async() => {

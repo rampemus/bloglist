@@ -82,9 +82,22 @@ describe('data of blog can be added and removed', () => {
 
     })
 
+    test('Blog likes can be edited', async() => {
+        const response = await api
+            .put( '/api/blogs/' + responseToPost.body.id )
+            .send({ likes: 11 })
+            .expect(202)
+
+        const responseToGet = await api
+            .get('/api/blogs')
+        expect(responseToGet.body.find((blog) => {
+            if ( blog.id === response.body.id) return blog
+        }).likes).toBe(11)
+    })
+
     test('Blog can be deleted', async() => {
         await api
-            .delete('/api/blogs/'+responseToPost.body.id)
+            .delete( '/api/blogs/' + responseToPost.body.id )
             .expect(204)
     })
 })

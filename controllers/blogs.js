@@ -20,6 +20,13 @@ blogsRouter.post('/api/blogs', async (request, response) => {
     response.status(201).json(result)
 })
 
+blogsRouter.put('/api/blogs/:id', async (request, response) => {
+    const id = request.params.id
+    const result = await Blog.findOneAndUpdate({ _id: id }, request.body, { new: true, useFindAndModify:false })
+        .catch( error => response.status(400).json({ error: error.message }).end() )
+    response.status(202).json(result)
+})
+
 blogsRouter.delete('/api/blogs/:id', async (request, response) => {
     await Blog.deleteOne({ _id:request.params.id })
         .catch( () => response.status(400).end())

@@ -56,4 +56,17 @@ describe('case: initially one user in db', () => {
             .expect(400)
 
     })
+
+    test('usernames shorter than 3 will be refused', async() => {
+
+        const shortUser = { ...User1, username: 'op' }
+
+        console.log('too short user is ', shortUser)
+
+        await api
+            .post('/api/users')
+            .send(shortUser)
+            .expect(400)
+
+    })
 })

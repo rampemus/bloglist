@@ -43,6 +43,7 @@ beforeEach( async () => {
             likes:5,
             user: rootUser.id
         })
+
 })
 
 describe('blog data retrieved correctly', () => {
@@ -65,12 +66,17 @@ describe('blog data retrieved correctly', () => {
 })
 
 describe('data of blog can be added and removed', () => {
-    let testBlog = {
-        title: 'First class tests',
-        author: 'Robert C. Martin',
-        url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-        likes: 10
-    }
+    let testBlog =''
+
+    beforeEach(() => {
+        testBlog = {
+            title: 'First class tests',
+            author: 'Robert C. Martin',
+            url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+            likes: 10,
+            user: rootUser.id
+        }
+    })
 
     test('Blog can be added', async() => {
 
@@ -103,6 +109,7 @@ describe('data of blog can be added and removed', () => {
     })
 
     test('Blog likes can be edited', async() => {
+
         const responseToPost = await api
             .post('/api/blogs')
             .send(testBlog)
@@ -123,6 +130,7 @@ describe('data of blog can be added and removed', () => {
     })
 
     test('Blog can be deleted', async() => {
+
         const responseToPost = await api
             .post('/api/blogs')
             .send(testBlog)
@@ -139,7 +147,8 @@ describe('blogs are validated', () => {
         const blogWithoutLikes = {
             title: 'First class tests',
             author: 'Robert C. Martin',
-            url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
+            url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+            user: rootUser.id
         }
 
         const responseToPost = await api
@@ -156,7 +165,8 @@ describe('blogs are validated', () => {
         const blogWithoutTitle = {
             author: 'Robert C. Martin',
             url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-            likes: 10
+            likes: 10,
+            user: rootUser.id
         }
 
         await api
@@ -169,7 +179,8 @@ describe('blogs are validated', () => {
         const blogWithoutUrl = {
             title: 'First class tests',
             author: 'Robert C. Martin',
-            likes: 10
+            likes: 10,
+            user: rootUser.id
         }
 
         await api
@@ -178,6 +189,16 @@ describe('blogs are validated', () => {
             .expect(400)
     })
 
+    test('blogs are populated with user information', async () => {
+        const response = await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        for ( let i = 0; i < response.body.length; i++) {
+            expect(response.body[i].user).toBeDefined()
+        }
+    })
 })
 
 afterAll( async () => {

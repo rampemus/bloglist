@@ -5,10 +5,10 @@ const userSchema = mongoose.Schema({
     username: { type: String, minlength: 3, required: true, unique: true },
     name: String,
     passwordHash: { type: String, required: true },
-    notes: {
+    blogs: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Blog'
-    }
+    }]
 })
 
 userSchema.set('toJSON', {

@@ -1,31 +1,49 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+const config = require('../utils/config')
 
 const api = supertest(app)
 
 const realAmountOfBlogs = 2
+let rootUser = ''
 
-/***
-    before running the tests make sure that data in the test db is
-    {
-        _id:5d4c156bbd1fa4efeb6594b0
-        title:"React patterns"
-        author:"Michael Chan"
-        url:"https://reactpatterns.com/"
-        likes:7
-        __v:0
-    }
-    {
-        _id:5d4d76eb0369c62ce3b2e4b9
-        title:"Go To Statement Considered Harmful"
-        author:"Edsger W. Dijkstra"
-        url:"http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html"
-        likes:5
-        __v:0
-    }
-***/
+beforeEach( async () => {
 
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash( config.ROOT_PASSWORD, 10 )
+    // const user =
+    const user = new User({
+        username: config.ROOT_USERNAME, name: 'Pasi Toivanen', passwordHash: passwordHash
+    })
+    rootUser = await user.save()
+    // console.log(rootUser.id)
+
+    await Blog.deleteMany({})
+
+    await api
+        .post('/api/blogs')
+        .send({
+            title:'React patterns',
+            author:'Michael Chan',
+            url:'https://reactpatterns.com/',
+            likes:7,
+            user: rootUser.id
+        })
+
+    await api
+        .post('/api/blogs')
+        .send({
+            title:'Go To Statement Considered Harmful',
+            author:'Edsger W. Dijkstra',
+            url:'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes:5,
+            user: rootUser.id
+        })
+})
 
 describe('blog data retrieved correctly', () => {
 
@@ -54,11 +72,9 @@ describe('data of blog can be added and removed', () => {
         likes: 10
     }
 
-    let responseToPost = null
-
     test('Blog can be added', async() => {
 
-        responseToPost = await api
+        await api
             .post('/api/blogs')
             .send(testBlog)
             .set('Accept', 'application/json')
@@ -68,6 +84,10 @@ describe('data of blog can be added and removed', () => {
     })
 
     test('Added blog exists', async() => {
+
+        const responseToPost = await api
+            .post('/api/blogs')
+            .send(testBlog)
 
         const response = await api
             .get('/api/blogs')
@@ -83,6 +103,10 @@ describe('data of blog can be added and removed', () => {
     })
 
     test('Blog likes can be edited', async() => {
+        const responseToPost = await api
+            .post('/api/blogs')
+            .send(testBlog)
+
         const response = await api
             .put( '/api/blogs/' + responseToPost.body.id )
             .send({ likes: 11 })
@@ -99,6 +123,10 @@ describe('data of blog can be added and removed', () => {
     })
 
     test('Blog can be deleted', async() => {
+        const responseToPost = await api
+            .post('/api/blogs')
+            .send(testBlog)
+
         await api
             .delete( '/api/blogs/' + responseToPost.body.id )
             .expect(204)
@@ -107,8 +135,6 @@ describe('data of blog can be added and removed', () => {
 
 describe('blogs are validated', () => {
 
-    let responseToPost = null
-
     test('likes will return 0 when sent as empty', async () => {
         const blogWithoutLikes = {
             title: 'First class tests',
@@ -116,7 +142,7 @@ describe('blogs are validated', () => {
             url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
         }
 
-        responseToPost = await api
+        const responseToPost = await api
             .post('/api/blogs')
             .send(blogWithoutLikes)
             .set('Accept', 'application/json')
@@ -155,19 +181,5 @@ describe('blogs are validated', () => {
 })
 
 afterAll( async () => {
-
-    const response = await api
-        .get('/api/blogs')
-
-    for ( let i = 0; i < response.body.length; i++ ) {
-        if (
-            response.body[i].id.toString() !== '5d4c156bbd1fa4efeb6594b0'
-            && response.body[i].id.toString() !== '5d4d76eb0369c62ce3b2e4b9'
-        ) {
-            await api
-                .delete('/api/blogs/'+response.body[i].id)
-        }
-    }
-
     mongoose.connection.close()
 })

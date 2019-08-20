@@ -26,9 +26,7 @@ blogsRouter.post('/api/blogs', async (request, response) => {
             console.log('couldn\'t find the user')
         })
     const body = user._doc
-    const updateResponse = await User.findOneAndUpdate({ id:body.id }, { blogs:[ ...body.blogs, blog.id ] })
-
-    console.log(updateResponse)
+    await User.findOneAndUpdate({ id:body.id }, { blogs:[ ...body.blogs, blog.id ] }, { new: true, useFindAndModify:false })
 
     response.status(201).json(result)
 })

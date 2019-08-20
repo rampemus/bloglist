@@ -6,11 +6,9 @@ const User = require('../models/user')
 usersRouter.post('/api/users', async( request, response ) => {
 
     const body = await request.body
-
     const saltRounds = await 10
-
     const passwordHash = await bcrypt.hash( body.password, saltRounds )
-    //
+
     const user = await new User( {
         username: body.username,
         name: body.name,
@@ -23,7 +21,6 @@ usersRouter.post('/api/users', async( request, response ) => {
         })
 
     response.status(201).json(savedUser).end()
-
 })
 
 module.exports = usersRouter

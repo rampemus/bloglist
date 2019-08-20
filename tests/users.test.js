@@ -9,6 +9,8 @@ const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
+//TODO: clean up beforeEach
+
 describe('case: initially one user in db with no references', () => {
 
     beforeEach( async() => {
@@ -76,7 +78,6 @@ describe('case: initially one user in db with no references', () => {
 describe('case: one user in db that has written all blogs', () => {
     let rootUser = ''
     beforeEach( async () => {
-
         await User.deleteMany({})
         const passwordHash = await bcrypt.hash( config.ROOT_PASSWORD, 10 )
         // const user =
@@ -107,22 +108,28 @@ describe('case: one user in db that has written all blogs', () => {
                 likes:5,
                 user: rootUser.id
             })
+    })
 
+    test('user will be populated by blogs', async() => {
+        const response = await User.find ({}).populate({ path: 'blogs', select: 'title' })
+        for ( let i = 0; i < response[0].blogs.length; i++) {
+            expect(response[0].blogs[i].title).toBeDefined()
+            // console.log(response[0].blogs[i].title)
+        }
     })
 })
 
 afterAll( async () => {
+
+    //put some beautiful data for admiring in the server
     await User.deleteMany({})
     const passwordHash = await bcrypt.hash( config.ROOT_PASSWORD, 10 )
-    // const user =
     const user = new User({
         username: config.ROOT_USERNAME, name: 'Pasi Toivanen', passwordHash: passwordHash
     })
     const rootUser = await user.save()
-    // console.log(rootUser.id)
 
     await Blog.deleteMany({})
-
     await api
         .post('/api/blogs')
         .send({
@@ -132,7 +139,6 @@ afterAll( async () => {
             likes:7,
             user: rootUser.id
         })
-
     await api
         .post('/api/blogs')
         .send({
@@ -142,6 +148,12 @@ afterAll( async () => {
             likes:5,
             user: rootUser.id
         })
+
+    // const userDataAfterTests = await helper.usersInDb()
+    // const blogDataAfterTests = await helper.blogsInDb()
+    // console.log('tests done, data left in test server: ')
+    // console.log(userDataAfterTests)
+    // console.log(blogDataAfterTests)
 
     mongoose.connection.close()
 })

@@ -11,6 +11,8 @@ const api = supertest(app)
 const realAmountOfBlogs = 2
 let rootUser = ''
 
+//TODO: clean up beforeEach
+
 beforeEach( async () => {
 
     await User.deleteMany({})

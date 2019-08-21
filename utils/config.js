@@ -3,6 +3,8 @@ require('dotenv').config()
 let PORT = process.env.PORT
 let MONGODB_URI = process.env.MONGODB_URI
 
+let JWT_SALT = process.env.JWT_SALT
+
 let ROOT_USERNAME = ''
 let ROOT_PASSWORD = ''
 
@@ -25,5 +27,6 @@ module.exports = {
     ROOT_USERNAME,
     ROOT_PASSWORD,
     TESTUSER1_USERNAME,
-    TESTUSER1_PASSWORD
+    TESTUSER1_PASSWORD,
+    JWT_SALT
 }

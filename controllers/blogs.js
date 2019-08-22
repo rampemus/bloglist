@@ -3,9 +3,20 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const jwt = require('jsonwebtoken')
+const config = require('../utils/config')
 
 blogsRouter.use(cors())
 blogsRouter.use(bodyParser.json())
+
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    const schema = 'bearer'
+    if ( authorization && authorization.toLowerCase().startsWith(schema + ' ') ) {
+        return authorization.substring(schema.length + 1)
+    }
+    return null
+}
 
 blogsRouter.get('/api/blogs', async (request, response) => {
     const blogs = await Blog.find({}).populate('user')
@@ -13,22 +24,38 @@ blogsRouter.get('/api/blogs', async (request, response) => {
 })
 
 blogsRouter.post('/api/blogs', async (request, response) => {
-    const blog = await new Blog(request.body)
 
-    const result = await blog.save()
-        .catch( error => {
-            response.status(400).json({ error: error.message }).end()
-        })
+    const token = getTokenFrom(request)
 
-    //Find user and update blogs
-    const user = await User.findOne({ id:request.body.user.id })
-        .catch( () => {
-            console.log('couldn\'t find the user')
-        })
-    const body = user._doc
-    await User.findOneAndUpdate({ id:body.id }, { blogs:[ ...body.blogs, blog.id ] }, { new: true, useFindAndModify:false })
+    try {
+        const decodedToken = jwt.verify(token, config.JWT_SALT)
+        if (!token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
 
-    response.status(201).json(result)
+        const user = await User.findById(decodedToken.id)
+            .catch( () => {
+                console.log('couldn\'t find the user')
+                response.status(400).json({ error: 'couldn\'t find the user' }).end()
+            })
+
+        const blog = await new Blog({ ...request.body, user:user.id })
+
+        const result = await blog.save()
+            .catch( error => {
+                response.status(400).json({ error: error.message }).end()
+            })
+
+
+        //Find user and update blogs
+        await User.findOneAndUpdate({ _id:user.id }, { blogs:[ ...user.blogs, blog._id ] }, { new: true, useFindAndModify:false })
+
+        response.status(201).json(result)
+
+    } catch( error ) {
+        console.log('response.status(400).json({ error: error.message })')
+        response.status(400).json({ error: error.message })
+    }
 })
 
 blogsRouter.put('/api/blogs/:id', async (request, response) => {

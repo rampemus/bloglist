@@ -3,7 +3,7 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 // const helper = require('../utils/user_helper')
 
-usersRouter.post('/api/users', async( request, response ) => {
+usersRouter.post('/', async( request, response ) => {
 
     const body = await request.body
     const saltRounds = await 10

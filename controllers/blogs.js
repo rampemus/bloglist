@@ -1,13 +1,9 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const cors = require('cors')
-const bodyParser = require('body-parser')
+
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
-
-blogsRouter.use(cors())
-blogsRouter.use(bodyParser.json())
 
 const getTokenFrom = request => {
     const authorization = request.get('authorization')
@@ -18,12 +14,12 @@ const getTokenFrom = request => {
     return null
 }
 
-blogsRouter.get('/api/blogs', async (request, response) => {
+blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user')
     response.json(blogs)
 })
 
-blogsRouter.post('/api/blogs', async (request, response) => {
+blogsRouter.post('/', async (request, response) => {
 
     const token = getTokenFrom(request)
 
@@ -58,14 +54,14 @@ blogsRouter.post('/api/blogs', async (request, response) => {
     }
 })
 
-blogsRouter.put('/api/blogs/:id', async (request, response) => {
+blogsRouter.put('/:id', async (request, response) => {
     const id = request.params.id
     const result = await Blog.findOneAndUpdate({ _id: id }, request.body, { new: true, useFindAndModify:false })
         .catch( error => response.status(400).json({ error: error.message }).end() )
     response.status(202).json(result)
 })
 
-blogsRouter.delete('/api/blogs/:id', async (request, response) => {
+blogsRouter.delete('/:id', async (request, response) => {
     await Blog.deleteOne({ _id:request.params.id })
         .catch( () => response.status(400).end())
 

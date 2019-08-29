@@ -21,18 +21,10 @@ blogsRouter.post('/', async (request, response) => {
         }
 
         const user = await User.findById(decodedToken.id)
-            .catch( () => {
-                console.log('couldn\'t find the user')
-                response.status(400).json({ error: 'couldn\'t find the user' }).end()
-            })
 
         const blog = await new Blog({ ...request.body, user:user.id })
 
         const result = await blog.save()
-            .catch( error => {
-                response.status(400).json({ error: error.message }).end()
-            })
-
 
         //Find user and update blogs
         await User.findOneAndUpdate({ _id:user.id }, { blogs:[ ...user.blogs, blog._id ] }, { new: true, useFindAndModify:false })
@@ -40,7 +32,7 @@ blogsRouter.post('/', async (request, response) => {
         response.status(201).json(result)
 
     } catch( error ) {
-        console.log('response.status(400).json({ error: error.message })')
+        console.log(`response.status(400).json({ error: ${error.message} })`)
         response.status(400).json({ error: error.message })
     }
 })
@@ -53,10 +45,32 @@ blogsRouter.put('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    await Blog.deleteOne({ _id:request.params.id })
-        .catch( () => response.status(400).end())
 
-    response.status(204).end()
+    const token = request.token
+
+    try {
+        const decodedToken = jwt.verify(token, config.JWT_SALT)
+        if (!token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+
+        const user = await User.findById(decodedToken.id)
+
+        const newBlogList = [ ...user.blogs.filter( blog => blog.toString() !== request.params.id) ]
+
+        //Update users blogs-list
+        await User.findOneAndUpdate({ _id:user.id }, { blogs: newBlogList }, { new: true, useFindAndModify:false })
+
+        //Delete blog from data
+        await Blog.deleteOne({ _id:request.params.id })
+
+        response.status(204).end()
+
+    } catch( error ) {
+        console.log(`response.status(400).json({ error: ${error.message} })`)
+        response.status(400).json({ error: error.message })
+    }
+
 })
 
 module.exports = blogsRouter

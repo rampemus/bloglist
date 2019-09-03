@@ -14,6 +14,8 @@ blogsRouter.post('/', async (request, response) => {
 
     const token = request.token
 
+    console.log('token:',token)
+
     try {
         const decodedToken = jwt.verify(token, config.JWT_SALT)
         if (!token || !decodedToken.id) {
@@ -38,10 +40,20 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-    const id = request.params.id
-    const result = await Blog.findOneAndUpdate({ _id: id }, request.body, { new: true, useFindAndModify:false })
-        .catch( error => response.status(400).json({ error: error.message }).end() )
-    response.status(202).json(result)
+    const token = request.token
+
+    try {
+        const decodedToken = jwt.verify(token, config.JWT_SALT)
+        if (!token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+
+        const id = request.params.id
+        const result = await Blog.findOneAndUpdate({ _id: id }, request.body, { new: true, useFindAndModify:false })
+        response.status(202).json(result)
+    } catch( error ) {
+        response.status(400).json({ error: error.message })
+    }
 })
 
 blogsRouter.delete('/:id', async (request, response) => {

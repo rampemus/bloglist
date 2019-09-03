@@ -24,10 +24,10 @@ usersRouter.post('/', async( request, response ) => {
 })
 
 //gets public user information
-usersRouter.get('/:username', async (request, response) => {
-    const username = request.params.username
-    const user = await User.find({ username: username }).populate('blogs')
-    response.status(200).json({userid:user[0].id, username: user[0].username, blogs: user[0].blogs})
-})
+// usersRouter.get('/:username', async (request, response) => {
+//     const username = request.params.username
+//     const user = await User.find({ username: username }).populate('blogs')
+//     response.status(200).json({userid:user[0].id, username: user[0].username, blogs: user[0].blogs})
+// })
 
 module.exports = usersRouter

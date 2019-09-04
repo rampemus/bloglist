@@ -14,8 +14,6 @@ blogsRouter.post('/', async (request, response) => {
 
     const token = request.token
 
-    console.log('token:',token)
-
     try {
         const decodedToken = jwt.verify(token, config.JWT_SALT)
         if (!token || !decodedToken.id) {

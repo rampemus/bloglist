@@ -66,15 +66,19 @@ blogsRouter.delete('/:id', async (request, response) => {
 
         const user = await User.findById(decodedToken.id)
 
-        const newBlogList = [ ...user.blogs.filter( blog => blog.toString() !== request.params.id) ]
+        if (user.blogs.includes(request.params.id)) {
+            const newBlogList = [ ...user.blogs.filter( blog => blog.toString() !== request.params.id) ]
 
-        //Update users blogs-list
-        await User.findOneAndUpdate({ _id:user.id }, { blogs: newBlogList }, { new: true, useFindAndModify:false })
+            //Update users blogs-list
+            await User.findOneAndUpdate({ _id:user.id }, { blogs: newBlogList }, { new: true, useFindAndModify:false })
 
-        //Delete blog from data
-        await Blog.deleteOne({ _id:request.params.id })
+            //Delete blog from data
+            await Blog.deleteOne({ _id:request.params.id })
 
-        response.status(204).end()
+            response.status(204).end()
+        } else {
+            response.status(401).json({ error: 'blog post is not owned by user' })
+        }
 
     } catch( error ) {
         console.log(`response.status(400).json({ error: ${error.message} })`)

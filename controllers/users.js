@@ -5,22 +5,22 @@ const User = require('../models/user')
 
 usersRouter.post('/', async( request, response ) => {
 
-    const body = await request.body
-    const saltRounds = await 10
-    const passwordHash = await bcrypt.hash( body.password, saltRounds )
+  const body = await request.body
+  const saltRounds = await 10
+  const passwordHash = await bcrypt.hash( body.password, saltRounds )
 
-    const user = await new User( {
-        username: body.username,
-        name: body.name,
-        passwordHash: passwordHash
+  const user = await new User( {
+    username: body.username,
+    name: body.name,
+    passwordHash: passwordHash
+  })
+
+  const savedUser = await user.save()
+    .catch( error => {
+      response.status(400).json({ error: error.message }).end()
     })
 
-    const savedUser = await user.save()
-        .catch( error => {
-            response.status(400).json({ error: error.message }).end()
-        })
-
-    response.status(201).json(savedUser).end()
+  response.status(201).json(savedUser).end()
 })
 
 //gets public user information

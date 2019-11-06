@@ -1,7 +1,7 @@
 {
     "name": "bloglist",
     "version": "1.0.0",
-    "description": "fullstack course exercise 4.1-4.2",
+    "description": "fullstack course exercise 7.4 ->",
     "main": "index.js",
     "jest": {
         "testEnvironment": "node"

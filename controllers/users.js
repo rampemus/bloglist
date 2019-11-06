@@ -4,9 +4,10 @@ const User = require('../models/user')
 // const helper = require('../utils/user_helper')
 
 usersRouter.post('/', async( request, response ) => {
+  // TODO: Implement admin check here
 
   const body = await request.body
-  const saltRounds = await 10
+  const saltRounds = 10
   const passwordHash = await bcrypt.hash( body.password, saltRounds )
 
   const user = await new User( {
@@ -23,11 +24,10 @@ usersRouter.post('/', async( request, response ) => {
   response.status(201).json(savedUser).end()
 })
 
-//gets public user information
-// usersRouter.get('/:username', async (request, response) => {
-//     const username = request.params.username
-//     const user = await User.find({ username: username }).populate('blogs')
-//     response.status(200).json({userid:user[0].id, username: user[0].username, blogs: user[0].blogs})
-// })
+usersRouter.get('/', async( request, response ) => {
+  // TODO: implement some token checkin here
+  const users = await User.find({})
+  response.status(200).json(users)
+})
 
 module.exports = usersRouter

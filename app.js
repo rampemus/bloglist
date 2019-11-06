@@ -19,7 +19,7 @@ app.use(middleware.tokenExtractor)
 const mongoUrl = config.MONGODB_URI
 
 mongoose.set('useCreateIndex', true)
-mongoose.connect(mongoUrl, { useNewUrlParser: true })
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.use('/api/blogs', blogsRouter)
 

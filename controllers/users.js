@@ -30,4 +30,11 @@ usersRouter.get('/', async( request, response ) => {
   response.status(200).json(users)
 })
 
+usersRouter.get('/:id', async (request, response) => {
+  // TODO: implement some token checkin here
+  const id = request.params.id
+  const user = await User.findById(id).populate('blogs')
+  response.status(200).json(user)
+})
+
 module.exports = usersRouter

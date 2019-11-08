@@ -10,6 +10,13 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs)
 })
 
+blogsRouter.get('/:id', async (request, response) => {
+  // TODO: implement some token checkin here
+  const id = request.params.id
+  const user = await Blog.findById(id).populate('user')
+  response.status(200).json(user)
+})
+
 blogsRouter.post('/', async (request, response) => {
 
   const token = request.token

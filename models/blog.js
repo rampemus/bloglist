@@ -20,7 +20,11 @@ const blogSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  comments: [{
+    type: String,
+    minlength: 2
+  }]
 })
 
 blogSchema.set('toJSON', {

@@ -61,6 +61,20 @@ blogsRouter.put('/:id', async (request, response) => {
   }
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const id = request.params.id
+
+  console.log('Received a comment: ', request.body)
+
+  const blog = await Blog.findById(id)
+  const newCommentList = blog.comments.concat(request.body.message)
+  console.log('answering', newCommentList)
+
+  const result = await Blog.findOneAndUpdate({ _id: id }, { comments: newCommentList }, { new: true, useFindAndModify: false })
+
+  response.status(200).json(result)
+})
+
 blogsRouter.delete('/:id', async (request, response) => {
 
   const token = request.token
